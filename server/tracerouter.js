@@ -3,7 +3,7 @@ const { exec } = require("child_process");
 function getListOfHops(destination) {
     return new Promise((resolve, reject) => {
         // exec(`tracert ${destination}`, (error, stdout, stderr) => {
-        exec(`traceroute -I ${destination}`, (error, stdout, stderr) => {
+        exec(`traceroute ${destination}`, (error, stdout, stderr) => {
             if (error) {
                 reject(error);
                 return;
