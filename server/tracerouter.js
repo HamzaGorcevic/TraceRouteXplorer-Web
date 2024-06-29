@@ -72,7 +72,7 @@ function LinuxExec(lines) {
 
         console.log("line:", line, "\n", "ip:", ip);
 
-        if (ip && ip.length > 20 && !ip.message) {
+        if (ip && ip.length > 20 && ip.country_flag.lenght > 2) {
             const regex = /\((.*?)\)/;
             const match = ip.match(regex);
             ip = match ? match[1] : ip;
