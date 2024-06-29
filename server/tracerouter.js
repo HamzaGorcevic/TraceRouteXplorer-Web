@@ -2,8 +2,8 @@ const { exec } = require("child_process");
 
 function getListOfHops(destination) {
     return new Promise((resolve, reject) => {
-        exec(`tracert ${destination}`, (error, stdout, stderr) => {
-            // exec(`traceroute -I ${destination}`, (error, stdout, stderr) => {
+        // exec(`tracert ${destination}`, (error, stdout, stderr) => {
+        exec(`traceroute -I ${destination}`, (error, stdout, stderr) => {
             if (error) {
                 reject(error);
                 return;
@@ -13,7 +13,7 @@ function getListOfHops(destination) {
             console.log("STDOUT :", stdout.toString());
 
             const lines = stdout.toString().split("\n");
-            const hops = WindowsExec(lines);
+            const hops = LinuxExec(lines);
             console.log("HOPS: ", hops);
 
             resolve(hops);
