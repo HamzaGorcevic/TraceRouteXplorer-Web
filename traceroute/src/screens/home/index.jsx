@@ -57,18 +57,18 @@ const MapComponent = () => {
             if (result[i] != "1") {
                 const [lat, lon] = [result[i].latitude, result[i].longitude];
 
-                let tempLon = lon.toString().split(".");
-                let tempLat = lat.toString().split(".");
+                let tempLon = lon?.toString().split(".");
+                let tempLat = lat?.toString().split(".");
 
-                if (tempLon.length > 2) {
+                if (tempLon?.length > 2) {
                     tempLon.pop();
                 }
-                if (tempLat.length > 2) {
+                if (tempLat?.length > 2) {
                     tempLat.pop();
                 }
 
-                const newLon = parseFloat(tempLon.join("."));
-                const newLat = parseFloat(tempLat.join("."));
+                const newLon = parseFloat(tempLon?.join("."));
+                const newLat = parseFloat(tempLat?.join("."));
 
                 let temp = [newLon + i / 1000, newLat + i / 1000];
 
@@ -139,6 +139,7 @@ const MapComponent = () => {
             }
         };
     }, [toggler]);
+
     useEffect(() => {
         if (map) {
             map.flyTo({
