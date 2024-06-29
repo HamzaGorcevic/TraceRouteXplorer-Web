@@ -1,0 +1,10 @@
+services:
+    - type: web
+      name: my-node-app
+      env: node
+      plan: free # or your desired plan
+      buildCommand: |
+          apt-get update
+          apt-get install -y traceroute
+          npm install
+      startCommand: npm start
