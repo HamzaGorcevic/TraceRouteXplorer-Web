@@ -9,9 +9,11 @@ const MapComponent = () => {
     mapboxgl.accessToken =
         "pk.eyJ1IjoiaGFtemEzMjQ1IiwiYSI6ImNsbjh6YnNpNTAwY3MycWw1cHYwNXo1N24ifQ.ffBExfXWXnWCoEWIqJzgEg";
 
-    const url = "http://localhost:8080";
+    // const url = "http://localhost:8080";
     // const url = "https://tracerouter-servrer.onrender.com";
     // const url = "http://localhost:5000";
+
+    const url = "https://traceroutexplorer-web-2.onrender.com";
 
     const [map, setMap] = useState(null);
     const [loader, setLoader] = useState(false);
