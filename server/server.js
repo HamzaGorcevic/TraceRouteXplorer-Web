@@ -1,4 +1,3 @@
-const ping = require("ping");
 const cors = require("cors");
 const axios = require("axios");
 const express = require("express");
