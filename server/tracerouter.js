@@ -67,7 +67,8 @@ function LinuxExec(lines) {
     // Iterate over each line in the input string
     lines.forEach((line) => {
         // Extracting the hop number, IP address, and round-trip times
-        const [hop, ip, ...rtt] = line.trim().split("  ");
+        const [hop, ipField, ...rtt] = line.trim().split("  ");
+        let ip = ipField;
 
         console.log("line:", line, "\n", "ip:", ip);
 
