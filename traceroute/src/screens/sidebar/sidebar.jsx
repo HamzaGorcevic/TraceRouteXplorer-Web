@@ -13,7 +13,6 @@ const Sidebar = ({ hops, icon }) => {
     //     el.lat = el.lat + i / 10000;
     //     return el;
     // });
-    console.log("sidebar:", hops);
     return (
         <div className="sidebar">
             {hops.length > 1 ? (

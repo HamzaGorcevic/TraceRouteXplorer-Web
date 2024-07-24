@@ -52,9 +52,8 @@ const MapComponent = () => {
     const showImageOfMap = (result) => {
         setLoader(false);
         let coordinates = [];
-        console.log(result);
         for (let i = 0; i < result.length; i++) {
-            if (result[i] != "1") {
+            if (result[i] != "1" && result[i].ip) {
                 const [lat, lon] = [result[i].latitude, result[i].longitude];
 
                 let tempLon = lon?.toString().split(".");
@@ -92,6 +91,9 @@ const MapComponent = () => {
                 }
             }
         }
+
+        // why am i setting hopse here, cuz of sidebar ?
+
         setHops(result);
 
         if (coordinates.length >= 2) {
@@ -161,8 +163,8 @@ const MapComponent = () => {
             setLoader(true);
 
             //  currently working on !
-
             const hostURL = document.querySelector(".usersHostValue").value;
+
             setIcon(`https://icon.horse/icon/${hostURL}`);
 
             let hops = await fetch(url + `/traceroute`, {
@@ -184,10 +186,8 @@ const MapComponent = () => {
                 });
 
             hops.unshift({ ip: "" });
-            console.log(hops);
             const result = await Promise.all(
                 hops.map(async (item) => {
-                    console.log(item);
                     if (
                         item.ip.trim() == "Request timed out." ||
                         item.ip.trim() == "Trace complete." ||
@@ -204,11 +204,9 @@ const MapComponent = () => {
                         .catch((er) => {
                             return { ip: "" };
                         });
-                    console.log(response);
                     return response;
                 })
             );
-            console.log("result:", result);
             showImageOfMap(result);
         }
     };
@@ -221,7 +219,6 @@ const MapComponent = () => {
         const response = await fetch(url + "/test");
 
         const data = await response.json();
-        console.log(data);
     }
 
     return (
