@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/TraceRouteXplorer-Web/static/css/main.6650c4cb.css",
-    "main.js": "/TraceRouteXplorer-Web/static/js/main.278544d6.js",
+    "main.js": "/TraceRouteXplorer-Web/static/js/main.ed8d099d.js",
     "static/js/787.104b4991.chunk.js": "/TraceRouteXplorer-Web/static/js/787.104b4991.chunk.js",
     "static/media/logo.svg": "/TraceRouteXplorer-Web/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
     "index.html": "/TraceRouteXplorer-Web/index.html",
     "main.6650c4cb.css.map": "/TraceRouteXplorer-Web/static/css/main.6650c4cb.css.map",
-    "main.278544d6.js.map": "/TraceRouteXplorer-Web/static/js/main.278544d6.js.map",
+    "main.ed8d099d.js.map": "/TraceRouteXplorer-Web/static/js/main.ed8d099d.js.map",
     "787.104b4991.chunk.js.map": "/TraceRouteXplorer-Web/static/js/787.104b4991.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.6650c4cb.css",
-    "static/js/main.278544d6.js"
+    "static/js/main.ed8d099d.js"
   ]
 }
