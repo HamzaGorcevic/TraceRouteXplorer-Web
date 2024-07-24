@@ -14,6 +14,8 @@ const MapComponent = () => {
     // const url = "http://localhost:5000";
 
     const url = "https://traceroutexplorer-web-2.onrender.com";
+    const southeastasiaUrl =
+        "https://traceroutexplorer-web-southeastasia.onrender.com";
 
     const [map, setMap] = useState(null);
     const [loader, setLoader] = useState(false);
@@ -37,6 +39,7 @@ const MapComponent = () => {
     };
 
     function clearMap() {
+        setHops([]);
         setToggler(!toggler);
     }
 
@@ -167,7 +170,7 @@ const MapComponent = () => {
 
             setIcon(`https://icon.horse/icon/${hostURL}`);
 
-            let hops = await fetch(url + `/traceroute`, {
+            let hops = await fetch(southeastasiaUrl + `/traceroute`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -186,6 +189,7 @@ const MapComponent = () => {
                 });
 
             hops.unshift({ ip: "" });
+
             const result = await Promise.all(
                 hops.map(async (item) => {
                     if (
@@ -215,12 +219,6 @@ const MapComponent = () => {
         return <Sidebar hops={hops} icon={icon} />;
     }, [hops, icon]);
 
-    async function giveMEMEME() {
-        const response = await fetch(url + "/test");
-
-        const data = await response.json();
-    }
-
     return (
         <div className="container">
             <div className="infoContainer">
@@ -230,7 +228,6 @@ const MapComponent = () => {
                     traceroute that maps and enriches output from mtr. With ASN
                     and Geolocation data to better understand the network path.
                 </p>
-                <button onClick={giveMEMEME}>GIVE ME MEME</button>
             </div>
 
             <div className="searchContainer">
