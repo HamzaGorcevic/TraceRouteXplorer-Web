@@ -51,7 +51,7 @@ const MapComponent = () => {
         setLoader(false);
         let coordinates = [];
         for (let i = 0; i < result.length; i++) {
-            if (result[i] != "1" && result[i].ip) {
+            if (result[i] != "1" && !result[i].bogon && result[i].ip) {
                 console.log("wtf", result[i].ip, result[i]);
 
                 const [lat, lon] = result[i].loc.split(",");
