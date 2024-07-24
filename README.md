@@ -6,4 +6,4 @@
 
 ## Live Demo
 
-[TraceRouteXplorer-Web Live Demo](#) *(https://hamzagorcevic.github.io/TraceRouteXplorer-Web/)*
+[TraceRouteXplorer-Web Live Demo](#https://hamzagorcevic.github.io/TraceRouteXplorer-Web/)
