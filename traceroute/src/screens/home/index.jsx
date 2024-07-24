@@ -1,17 +1,13 @@
-// MapComponent.js
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import { RevolvingDot } from "react-loader-spinner";
 import Sidebar from "../sidebar/sidebar";
 import "./landing.css";
 import { CoordsContext } from "../../contex";
+
 const MapComponent = () => {
     mapboxgl.accessToken =
         "pk.eyJ1IjoiaGFtemEzMjQ1IiwiYSI6ImNsbjh6YnNpNTAwY3MycWw1cHYwNXo1N24ifQ.ffBExfXWXnWCoEWIqJzgEg";
-
-    // const url = "http://localhost:8080";
-    // const url = "https://tracerouter-servrer.onrender.com";
-    // const url = "http://localhost:5000";
 
     const url = "https://traceroutexplorer-web-2.onrender.com";
     const southeastasiaUrl =
@@ -39,7 +35,6 @@ const MapComponent = () => {
     };
 
     function clearMap() {
-        setHops([]);
         setToggler(!toggler);
     }
 
@@ -57,7 +52,9 @@ const MapComponent = () => {
         let coordinates = [];
         for (let i = 0; i < result.length; i++) {
             if (result[i] != "1" && result[i].ip) {
-                const [lat, lon] = [result[i].latitude, result[i].longitude];
+                console.log("wtf", result[i].ip, result[i]);
+
+                const [lat, lon] = result[i].loc.split(",");
 
                 let tempLon = lon?.toString().split(".");
                 let tempLat = lat?.toString().split(".");
@@ -80,7 +77,7 @@ const MapComponent = () => {
                 var popup = new mapboxgl.Popup({
                     className: "custom-popup",
                 }).setHTML(
-                    `<p>${result[i].country_name}</p><p>${i}.hop</p><p>${result[i].city}</p><p>ip:address ${result[i].ip}</p><p>lat: ${result[i].latitude} lon: ${result[i].longitude}</p>`
+                    `<p>${result[i].country}</p><p>${i}.hop</p><p>${result[i].city}</p><p>ip:address ${result[i].ip}</p><p>lat: ${result[i].latitude} lon: ${result[i].longitude}</p>`
                 );
 
                 if (!isNaN(temp[0])) {
@@ -94,8 +91,6 @@ const MapComponent = () => {
                 }
             }
         }
-
-        // why am i setting hopse here, cuz of sidebar ?
 
         setHops(result);
 
@@ -141,6 +136,7 @@ const MapComponent = () => {
         return () => {
             if (map) {
                 map.remove();
+                setHops([]);
             }
         };
     }, [toggler]);
@@ -158,14 +154,19 @@ const MapComponent = () => {
     function isPrivateIPAddress(ip) {
         const privateIPRegex = /^(?:10|127|169\.254|192\.168)\./;
         const privateIPRangeRegex = /^172\.(1[6-9]|2[0-9]|3[0-1])\./;
-        return privateIPRegex.test(ip) || privateIPRangeRegex.test(ip);
+        const futureUseRangeRegex = /^240\./;
+
+        return (
+            privateIPRegex.test(ip) ||
+            privateIPRangeRegex.test(ip) ||
+            futureUseRangeRegex.test(ip)
+        );
     }
 
     const handleMeasureLatencyClick = async (e) => {
         if (e.key == "Enter" || e.type == "click") {
             setLoader(true);
 
-            //  currently working on !
             const hostURL = document.querySelector(".usersHostValue").value;
 
             setIcon(`https://icon.horse/icon/${hostURL}`);
@@ -175,14 +176,10 @@ const MapComponent = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ destination: hostURL }), // Use "destination" as the key
+                body: JSON.stringify({ destination: hostURL }),
             })
-                .then((response) => {
-                    return response.json();
-                })
-                .then((res) => {
-                    return res;
-                })
+                .then((response) => response.json())
+                .then((res) => res)
                 .catch((err) => {
                     console.log("ERROR:", err);
                     return [];
@@ -192,22 +189,21 @@ const MapComponent = () => {
 
             const result = await Promise.all(
                 hops.map(async (item) => {
-                    if (
-                        item.ip.trim() == "Request timed out." ||
-                        item.ip.trim() == "Trace complete." ||
-                        isPrivateIPAddress(item.ip)
-                    ) {
+                    if (isPrivateIPAddress(item.ip)) {
                         return "1";
                     }
 
+                    console.log(item.ip);
                     const response = await fetch(
-                        `https://api.ipgeolocation.io/ipgeo?apiKey=390b7bba2614408cab65ac286cdfffd1&ip=${item.ip}`
+                        `https://ipinfo.io/${item.ip}?token=fe4a38beab2d32`
                     )
                         .then((el) => el.json())
                         .then((res) => res)
                         .catch((er) => {
                             return { ip: "" };
                         });
+
+                    console.log("RESPONSE:", response);
                     return response;
                 })
             );
