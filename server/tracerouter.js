@@ -16,7 +16,7 @@ function getListOfHops(destination, userDestination) {
 
 function executeTraceroute(destination) {
     return new Promise((resolve, reject) => {
-        exec(`tracerote ${destination}`, (error, stdout, stderr) => {
+        exec(`traceroute ${destination}`, (error, stdout, stderr) => {
             if (error) {
                 reject(error);
                 return;
