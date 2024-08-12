@@ -1,24 +1,42 @@
 const { exec } = require("child_process");
 
-function getListOfHops(destination) {
+function getListOfHops(destination, userDestination) {
+    return Promise.all([
+        executeTraceroute(destination),
+        executeTraceroute(userDestination),
+    ])
+        .then(([destinationHops, userDestinationHops]) => ({
+            destinationHops,
+            userDestinationHops,
+        }))
+        .catch((error) => {
+            throw new Error(`Error in traceroute: ${error.message}`);
+        });
+}
+
+function executeTraceroute(destination) {
     return new Promise((resolve, reject) => {
-        // exec(`tracert ${destination}`, (error, stdout, stderr) => {
-        exec(`traceroute ${destination}`, (error, stdout, stderr) => {
+        exec(`tracerote ${destination}`, (error, stdout, stderr) => {
             if (error) {
                 reject(error);
                 return;
             }
 
             // Parse the output of traceroute
-            console.log("STDOUT :", stdout.toString());
-
+            console.log(`Traceroute to ${destination}:`, stdout.toString());
             const lines = stdout.toString().split("\n");
-            const hops = LinuxExec(lines);
-            console.log("HOPS: ", hops);
-
+            const hops = parseTracerouteOutput(lines);
             resolve(hops);
         });
     });
+}
+
+function parseTracerouteOutput(lines) {
+    if (process.platform === "win32") {
+        return WindowsExec(lines);
+    } else {
+        return LinuxExec(lines);
+    }
 }
 
 function WindowsExec(lines) {
@@ -34,7 +52,6 @@ function WindowsExec(lines) {
                 const match = address.match(regex);
                 address = match[1];
             }
-            console.log("parts: ", parts, "address:", address);
 
             const rttValues = parts
                 .slice(1, -1)
@@ -45,7 +62,6 @@ function WindowsExec(lines) {
                     }
                 })
                 .filter((value) => value !== undefined);
-            console.log("rttValues", rttValues);
             return {
                 hop,
                 ip: address,
@@ -60,8 +76,6 @@ function WindowsExec(lines) {
 }
 function LinuxExec(lines) {
     lines.shift();
-    console.log("LINES:", lines);
-
     const result = [];
 
     // Iterate over each line in the input string
@@ -69,9 +83,6 @@ function LinuxExec(lines) {
         // Extracting the hop number, IP address, and round-trip times
         const [hop, ipField, ...rtt] = line.trim().split("  ");
         let ip = ipField;
-
-        console.log("line:", line, "\n", "ip:", ip);
-
         if (ip && ip.length > 5) {
             const regex = /\((.*?)\)/;
             const match = ip.match(regex);

@@ -35,10 +35,12 @@ app.use(
 );
 
 app.post("/traceroute", async (req, res) => {
-    const { destination } = req.body;
-    console.log("destination:", destination);
+    const { destination, userDestination } = req.body;
+    console.log("destination:", destination, userDestination);
     try {
-        tracerouter.getListOfHops(destination).then((hops) => res.json(hops));
+        tracerouter
+            .getListOfHops(destination, userDestination)
+            .then((hops) => res.json(hops));
     } catch (error) {
         console.error("Error during traceroute:", error);
         res.status(500).json({ error: "Error during traceroute" });
