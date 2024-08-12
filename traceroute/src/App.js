@@ -1,5 +1,4 @@
-import logo from "./logo.svg";
-import "./App.css";
+import "./global.css";
 import MapComponent from "./screens/home";
 import Context from "./contex";
 

@@ -6,11 +6,15 @@ import "./landing.css";
 import { CoordsContext } from "../../contex";
 
 const MapComponent = () => {
-    mapboxgl.accessToken =
-        "pk.eyJ1IjoiaGFtemEzMjQ1IiwiYSI6ImNsbjh6YnNpNTAwY3MycWw1cHYwNXo1N24ifQ.ffBExfXWXnWCoEWIqJzgEg";
+    mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
-    const url = "https://traceroutexplorer-web-2.onrender.com";
-    const southeastasiaUrl =
+    console.log(
+        process.env.REACT_APP_MAPBOX_ACCESS_TOKEN,
+        process.env.REACT_APP_TEST,
+        process.env
+    );
+    const germanyUrl = "https://traceroutexplorer-web-2.onrender.com";
+    const southEastAsiaUrl =
         "https://traceroutexplorer-web-southeastasia.onrender.com";
 
     const [map, setMap] = useState(null);
@@ -23,7 +27,6 @@ const MapComponent = () => {
 
     const initializeMap = () => {
         const initialCoordinates = [43.158157, 20.346822];
-
         const newMap = new mapboxgl.Map({
             container: "map",
             style: "mapbox://styles/mapbox/streets-v12",
@@ -171,7 +174,7 @@ const MapComponent = () => {
 
             setIcon(`https://icon.horse/icon/${hostURL}`);
 
-            let hops = await fetch(southeastasiaUrl + `/traceroute`, {
+            let hops = await fetch(southEastAsiaUrl + `/traceroute`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -184,16 +187,11 @@ const MapComponent = () => {
                     console.log("ERROR:", err);
                     return [];
                 });
-
-            hops.unshift({ ip: "" });
-
             const result = await Promise.all(
                 hops.map(async (item) => {
                     if (isPrivateIPAddress(item.ip)) {
                         return "1";
                     }
-
-                    console.log(item.ip);
                     const response = await fetch(
                         `https://ipinfo.io/${item.ip}?token=fe4a38beab2d32`
                     )
