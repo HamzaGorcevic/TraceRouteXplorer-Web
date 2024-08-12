@@ -1,24 +1,17 @@
 import React, { useContext } from "react";
 import "./sidebar.css";
 import { CoordsContext } from "../../contex";
-const Sidebar = ({ hops, icon }) => {
+
+const Sidebar = (data) => {
     const { setCoords } = useContext(CoordsContext);
 
-    // hops = hops.filter((el) => {
-    //     return el.lat;
-    // });
-
-    // hops.map((el, i) => {
-    //     el.lon = el.lon + i / 1000;
-    //     el.lat = el.lat + i / 10000;
-    //     return el;
-    // });
+    const hops = data.hops;
     return (
         <div className="sidebar">
             {hops.length > 1 ? (
                 <>
                     <div className="logo">
-                        <img src={icon} alt="Logo" />
+                        <img src={data.icon} alt="Logo" />
                     </div>
                     <div className="items">
                         {hops.map((hop, index) => (
@@ -37,7 +30,7 @@ const Sidebar = ({ hops, icon }) => {
                                 <div className="hop-number">{index + 1}</div>
                                 <div className="hop-info">
                                     <div className="country">
-                                        {hop?.country_name}
+                                        {hop?.country}
                                     </div>
                                     <div className="city">{hop?.city}</div>
                                     {hop.query === "Request timed out." ? (
@@ -49,10 +42,11 @@ const Sidebar = ({ hops, icon }) => {
                                             {hop.latitude && hop.longitude ? (
                                                 <div className="lat-long">
                                                     <div className="ip">
-                                                        ip: {hop?.ip}
+                                                        IP: {hop?.ip}
                                                     </div>
-                                                    <div className="ip">
-                                                        isp: {hop?.isp}
+                                                    <div className="timezone">
+                                                        Timezone:{" "}
+                                                        {hop?.timezone}
                                                     </div>
                                                     Lat: {hop?.latitude}, Lon:{" "}
                                                     {hop?.longitude}

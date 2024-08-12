@@ -35,7 +35,7 @@
 .searchContainer {
     display: flex;
     align-items: center;
-    width: 500px;
+    width: 600px;
     padding: 10px;
 }
 
@@ -51,7 +51,7 @@
 /* Style for the search button */
 .searchContainer button,
 .clearMap {
-    padding: 15px 20px;
+    padding: 12px 17px;
     background-color: #001f3f; /* Deep Space Blue */
     color: #ffd700; /* Celestial Gold */
     border: none;
@@ -142,4 +142,41 @@
 .custom-popup p:not(:first-child) {
     color: #666;
     font-size: 12px;
+}
+
+/* Style for the select dropdown */
+.searchContainer select {
+    padding: 10px;
+    border: 2px solid #607d8b; /* Cosmic Dust Gray */
+    border-radius: 5px;
+    font-size: 16px;
+    margin-left: 10px; /* Optional: Add margin if needed */
+    background-color: #fff; /* White background */
+    color: #001f3f; /* Deep Space Blue text */
+    appearance: none; /* Remove default arrow */
+    -webkit-appearance: none; /* Remove default arrow for Safari */
+    -moz-appearance: none; /* Remove default arrow for Firefox */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns%3D"http%3A//www.w3.org/2000/svg" width%3D"8" height%3D"8" viewBox%3D"0 0 8 8"%3E%3Cpath fill%3D"%23001f3f" d%3D"M4 5l-3-3h6z"%3E%3C/path%3E%3C/svg%3E'); /* Custom arrow */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px;
+}
+
+/* Style for the options */
+.searchContainer select option {
+    background-color: #fff; /* White background */
+    color: #001f3f; /* Deep Space Blue text */
+    padding: 10px;
+}
+
+/* Hover effect for the select dropdown */
+.searchContainer select:hover {
+    border-color: #004080; /* Darker shade of Cosmic Dust Gray */
+}
+
+/* Add focus effect for better accessibility */
+.searchContainer select:focus {
+    outline: none;
+    border-color: #004080; /* Darker shade of Cosmic Dust Gray */
+    box-shadow: 0 0 5px rgba(0, 64, 128, 0.5); /* Slight shadow for focus effect */
 }
