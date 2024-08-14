@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/TraceRouteXplorer-Web/static/css/main.c46106ba.css",
-    "main.js": "/TraceRouteXplorer-Web/static/js/main.233a4d48.js",
+    "main.css": "/TraceRouteXplorer-Web/static/css/main.7e83f150.css",
+    "main.js": "/TraceRouteXplorer-Web/static/js/main.81a207e1.js",
     "static/js/787.104b4991.chunk.js": "/TraceRouteXplorer-Web/static/js/787.104b4991.chunk.js",
     "index.html": "/TraceRouteXplorer-Web/index.html",
-    "main.c46106ba.css.map": "/TraceRouteXplorer-Web/static/css/main.c46106ba.css.map",
-    "main.233a4d48.js.map": "/TraceRouteXplorer-Web/static/js/main.233a4d48.js.map",
+    "main.7e83f150.css.map": "/TraceRouteXplorer-Web/static/css/main.7e83f150.css.map",
+    "main.81a207e1.js.map": "/TraceRouteXplorer-Web/static/js/main.81a207e1.js.map",
     "787.104b4991.chunk.js.map": "/TraceRouteXplorer-Web/static/js/787.104b4991.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.c46106ba.css",
-    "static/js/main.233a4d48.js"
+    "static/css/main.7e83f150.css",
+    "static/js/main.81a207e1.js"
   ]
 }
