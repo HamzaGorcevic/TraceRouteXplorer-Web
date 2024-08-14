@@ -38,6 +38,9 @@
     width: 600px;
     padding: 10px;
 }
+.searchContainer .actions {
+    display: flex;
+}
 
 /* Style for the search input */
 .searchContainer input[type="text"] {
@@ -162,6 +165,9 @@
     background-size: 10px;
 }
 
+.hidden {
+    display: none;
+}
 /* Style for the options */
 .searchContainer select option {
     background-color: #fff; /* White background */
@@ -179,4 +185,25 @@
     outline: none;
     border-color: #004080; /* Darker shade of Cosmic Dust Gray */
     box-shadow: 0 0 5px rgba(0, 64, 128, 0.5); /* Slight shadow for focus effect */
+}
+
+@media (max-width: 900px) {
+    .searchContainer {
+        width: 90%;
+        justify-content: space-around;
+    }
+
+    .searchContainer input[type="text"] {
+        width: 40%;
+    }
+    .actions {
+        width: 40%;
+    }
+    .actions button {
+        width: 45%;
+        padding: 1px;
+    }
+    .actions select {
+        width: 51%;
+    }
 }

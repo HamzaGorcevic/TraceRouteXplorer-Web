@@ -1,27 +1,38 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import { RevolvingDot } from "react-loader-spinner";
+
+import { fetchTracerouteData, fetchIpInfo, getRandomColor } from "./utils";
+import "./mapComponent.css";
 import Sidebar from "../sidebar/sidebar";
-import "./landing.css";
 import { CoordsContext } from "../../contex";
 
 const MapComponent = () => {
     mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
-
-    const germanyUrl = "https://traceroutexplorer-web-2.onrender.com";
-    const southEastAsiaUrl =
-        "https://traceroutexplorer-web-southeastasia.onrender.com";
-
     const [map, setMap] = useState(null);
     const [loader, setLoader] = useState(false);
-    const [toggler, setToggler] = useState(false);
-    const [value, setValue] = useState("");
-    const [icon, setIcon] = useState("");
     const [hops, setHops] = useState([]);
     const [server, setServer] = useState(
         "https://traceroutexplorer-web-2.onrender.com"
     );
-    const { coords } = useContext(CoordsContext);
+    const { coords, setCoords } = useContext(CoordsContext);
+    const [markers, setMarkers] = useState([]);
+
+    useEffect(() => {
+        initializeMap();
+
+        return () => {
+            if (map) {
+                map.remove();
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        if (map) {
+            map.flyTo({ zoom: 18, center: coords, speed: 3 });
+        }
+    }, [coords]);
 
     const initializeMap = () => {
         const initialCoordinates = [43.158157, 20.346822];
@@ -35,210 +46,30 @@ const MapComponent = () => {
         setMap(newMap);
     };
 
-    function clearMap() {
-        setToggler(!toggler);
-    }
-
-    function getRandomColor() {
-        const letters = "0123456789ABCDEF";
-        let color = "#";
-        for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
-
-    const showImageOfMap = (result) => {
-        setLoader(false);
-        let coordinates = [];
-        for (let i = 0; i < result.length; i++) {
-            if (result[i] != "1" && !result[i].bogon && result[i].ip) {
-                const [lat, lon] = result[i].loc.split(",");
-
-                let tempLon = lon?.toString().split(".");
-                let tempLat = lat?.toString().split(".");
-
-                if (tempLon?.length > 2) {
-                    tempLon.pop();
-                }
-                if (tempLat?.length > 2) {
-                    tempLat.pop();
-                }
-
-                const newLon = parseFloat(tempLon?.join("."));
-                const newLat = parseFloat(tempLat?.join("."));
-
-                let temp = [newLon + i / 1000, newLat + i / 1000];
-
-                [result[i].longitude, result[i].latitude] = temp;
-                coordinates.push(temp);
-
-                var popup = new mapboxgl.Popup({
-                    className: "custom-popup",
-                }).setHTML(
-                    `<p>Country: ${result[i].country}</p>
-                     <p>Hop: ${i}</p>
-                     <p>IP Address: ${result[i].ip}</p>
-                     <p>Latitude: ${result[i].latitude} Longitude: ${result[i].longitude}</p>
-                     <p>Hostname: ${result[i].hostname}</p>
-                     <p>Region: ${result[i].region}</p>
-                     <p>Organization: ${result[i].org}</p>
-                     <p>ASN: ${result[i].asn}</p>
-                     <p>Timezone: ${result[i].timezone}</p>
-                     <p>Company Name: ${result[i].company?.name}</p>
-                     <p>Company Domain: ${result[i].company?.domain}</p>
-                     `
-                );
-
-                if (!isNaN(temp[0])) {
-                    let marker = new mapboxgl.Marker({
-                        color: "blue",
-                        rotation: 45,
-                    })
-                        .setLngLat(temp)
-                        .addTo(map)
-                        .setPopup(popup);
-                }
-            }
+    const clearMap = () => {
+        if (markers.length) {
+            markers.forEach((marker) => marker.remove());
+            setMarkers([]);
         }
 
-        setHops(result);
-
-        if (coordinates.length >= 2) {
-            const segmentColors = Array.from(
-                { length: coordinates.length - 1 },
-                getRandomColor
-            );
-
-            for (let i = 0; i < coordinates.length - 1; i++) {
-                const startCoord = coordinates[i];
-                const endCoord = coordinates[i + 1];
-
-                const segmentGeojson = {
-                    type: "Feature",
-                    properties: {},
-                    geometry: {
-                        type: "LineString",
-                        coordinates: [startCoord, endCoord],
-                    },
-                };
-
-                map.addLayer({
-                    id: `${Math.random()}`,
-                    type: "line",
-                    source: {
-                        type: "geojson",
-                        data: segmentGeojson,
-                    },
-                    paint: {
-                        "line-color": segmentColors[i],
-                        "line-width": 10,
-                        "line-offset": 5,
-                    },
-                });
-            }
-        }
-    };
-
-    useEffect(() => {
-        initializeMap();
-        setHops([]);
-
-        return () => {
-            if (map) {
-                map.remove();
-            }
-        };
-    }, [toggler]);
-
-    useEffect(() => {
         if (map) {
-            map.flyTo({
-                zoom: 20,
-                center: coords,
-                speed: 3,
+            let layers = map.getStyle().layers;
+            layers.forEach((layer) => {
+                if (layer.id.startsWith("custom-layer-")) {
+                    map.removeLayer(layer.id);
+                }
             });
         }
-    }, [coords]);
-
-    function isPrivateIPAddress(ip) {
-        const privateIPRegex = /^(?:10|127|169\.254|192\.168)\./;
-        const privateIPRangeRegex = /^172\.(1[6-9]|2[0-9]|3[0-1])\./;
-        const futureUseRangeRegex = /^240\./;
-
-        return (
-            privateIPRegex.test(ip) ||
-            privateIPRangeRegex.test(ip) ||
-            futureUseRangeRegex.test(ip)
-        );
-    }
+    };
 
     const handleMeasureLatencyClick = async (e) => {
         if (e.key === "Enter" || (e.type === "click" && !loader)) {
             setLoader(true);
+            clearMap();
             try {
                 const hostURL = document.querySelector(".usersHostValue").value;
-                setIcon(`https://icon.horse/icon/${hostURL}`);
-
-                const response = await fetch(
-                    `https://ipinfo.io?token=fe4a38beab2d32`
-                );
-                let userDestination = await response.json();
-                userDestination = userDestination.ip;
-
-                let hopsResponse = await fetch(server + `/traceroute`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        destination: hostURL,
-                        userDestination: userDestination,
-                    }),
-                });
-
-                if (!hopsResponse.ok) {
-                    throw new Error("Failed to fetch traceroute data");
-                }
-
-                let hops = await hopsResponse.json();
-                let hopsUserDest = [...hops["userDestinationHops"], { ip: "" }];
-                let userDestinationHopsArray = await Promise.all(
-                    hopsUserDest.map(async (item) => {
-                        if (isPrivateIPAddress(item.ip)) {
-                            return "1";
-                        }
-                        try {
-                            const response = await fetch(
-                                `https://ipinfo.io/${item.ip}?token=fe4a38beab2d32`
-                            );
-                            return response.json();
-                        } catch (err) {
-                            return { ip: "" };
-                        }
-                    })
-                );
-
-                let destinationHopsArray = await Promise.all(
-                    hops["destinationHops"].map(async (item) => {
-                        if (isPrivateIPAddress(item.ip)) {
-                            return "1";
-                        }
-                        try {
-                            const response = await fetch(
-                                `https://ipinfo.io/${item.ip}?token=fe4a38beab2d32`
-                            );
-                            return response.json();
-                        } catch (err) {
-                            return { ip: "" };
-                        }
-                    })
-                );
-
-                let result = [
-                    ...userDestinationHopsArray.reverse(),
-                    ...destinationHopsArray,
-                ];
+                const result = await fetchTracerouteData(server, hostURL);
+                setHops(result);
                 showImageOfMap(result);
             } catch (error) {
                 console.error(error);
@@ -246,6 +77,87 @@ const MapComponent = () => {
             } finally {
                 setLoader(false);
             }
+        }
+    };
+
+    const addMarker = (lng, lat, popup) => {
+        const marker = new mapboxgl.Marker({ color: "blue", rotation: 45 })
+            .setLngLat([lng, lat])
+            .setPopup(popup)
+            .addTo(map);
+
+        setMarkers((prevMarkers) => [...prevMarkers, marker]);
+    };
+
+    const showImageOfMap = (result) => {
+        setLoader(false);
+        let coordinates = [];
+        result.forEach((hop, i) => {
+            if (hop !== "1" && !hop.bogon && hop.ip) {
+                const [lat, lon] = hop.loc.split(",");
+                const temp = [
+                    parseFloat(lon) + i / 1000,
+                    parseFloat(lat) + i / 1000,
+                ];
+                if (i == 0) {
+                    setCoords(temp);
+                }
+                coordinates.push(temp);
+                hop.longitude = temp[0];
+                hop.latitude = temp[1];
+
+                const popup = new mapboxgl.Popup({ className: "custom-popup" })
+                    .setHTML(`
+                        <p>Country: ${hop.country}</p>
+                        <p>Hop: ${i}</p>
+                        <p>IP Address: ${hop.ip}</p>
+                        <p>Latitude: ${hop.latitude} Longitude: ${hop.longitude}</p>
+                        <p>Hostname: ${hop.hostname}</p>
+                        <p>Region: ${hop.region}</p>
+                        <p>Organization: ${hop.org}</p>
+                        <p>ASN: ${hop.asn}</p>
+                        <p>Timezone: ${hop.timezone}</p>
+                        <p>Company Name: ${hop.company?.name}</p>
+                        <p>Company Domain: ${hop.company?.domain}</p>
+                    `);
+
+                if (!isNaN(temp[0])) {
+                    addMarker(temp[0], temp[1], popup);
+                }
+            }
+        });
+
+        if (coordinates.length >= 2) {
+            const segmentColors = Array.from(
+                { length: coordinates.length - 1 },
+                getRandomColor
+            );
+
+            coordinates.forEach((coord, i) => {
+                if (i < coordinates.length - 1) {
+                    const startCoord = coordinates[i];
+                    const endCoord = coordinates[i + 1];
+                    const segmentGeojson = {
+                        type: "Feature",
+                        properties: {},
+                        geometry: {
+                            type: "LineString",
+                            coordinates: [startCoord, endCoord],
+                        },
+                    };
+
+                    map.addLayer({
+                        id: `custom-layer-${Math.random()}`,
+                        type: "line",
+                        source: { type: "geojson", data: segmentGeojson },
+                        paint: {
+                            "line-color": segmentColors[i],
+                            "line-width": 10,
+                            "line-offset": 5,
+                        },
+                    });
+                }
+            });
         }
     };
 
@@ -261,57 +173,52 @@ const MapComponent = () => {
             </div>
 
             <div className="searchContainer">
-                <select
-                    disabled={loader}
-                    onChange={(el) => {
-                        setServer(el.target.value);
-                    }}
-                >
-                    <option value="https://traceroutexplorer-web-2.onrender.com">
-                        Europe
-                    </option>
-                    <option value="https://traceroutexplorer-web-southeastasia.onrender.com">
-                        South East Asia
-                    </option>
-                </select>
-
                 <input
                     type="text"
                     className="usersHostValue"
                     placeholder="Enter host URL"
                     onKeyDown={handleMeasureLatencyClick}
                 />
-
-                <button disabled={loader} onClick={handleMeasureLatencyClick}>
-                    Measure Latency
-                </button>
+                <div className="actions">
+                    <button
+                        disabled={loader}
+                        onClick={handleMeasureLatencyClick}
+                    >
+                        Trace
+                    </button>
+                    <select
+                        disabled={loader}
+                        onChange={(el) => setServer(el.target.value)}
+                    >
+                        <option value="https://traceroutexplorer-web-2.onrender.com">
+                            Europe
+                        </option>
+                        <option value="https://traceroutexplorer-web-southeastasia.onrender.com">
+                            South East Asia
+                        </option>
+                    </select>
+                </div>
             </div>
             <div className="containerMapSidebar">
                 <div className="mapContainer">
                     <button className="clearMap" onClick={clearMap}>
                         Clear map
                     </button>
-                    <div
-                        className="loader"
-                        style={{ display: `${loader ? "flex" : "none"}` }}
-                    >
+                    <div className={`loader ${!loader ? "hidden" : ""}`}>
                         <RevolvingDot
                             visible={true}
                             height="80"
                             width="80"
                             color="#4fa94d"
                             ariaLabel="revolving-dot-loading"
-                            wrapperStyle={{}}
-                            wrapperClass=""
                         />
                     </div>
-
                     <div
                         id="map"
                         style={{ height: "100%", width: "100%" }}
                     ></div>
                 </div>
-                <Sidebar hops={hops} icon={icon} />{" "}
+                <Sidebar hops={hops} />
             </div>
         </div>
     );
